@@ -93,6 +93,10 @@ public class SettlementService {
     }
     @Transactional
     public List<Settlement> settleUp(Long groupId){
+        List<Settlement> existingPending = settlementRepository.findByGroupIdAndStatus(groupId, "PENDING");
+        if (!existingPending.isEmpty()) {
+            return existingPending; // already have pending settlements — return them instead of duplicating
+        }
         List<SettlementTransaction> suggestions = simplifyDebts(groupId);
         List<Settlement> savedSettlements = new ArrayList<>();
         Group group = groupRepository.findById(groupId)
@@ -118,7 +122,7 @@ public class SettlementService {
         Settlement settlement = settlementRepository.findById(settlementId)
                 .orElseThrow(()-> new RuntimeException("Settlement not found"));
         if("CONFIRMED".equals(settlement.getStatus())){
-            throw new RuntimeException("Settlement already Confirmed");
+            return settlement;
         }
         settlement.setStatus("CONFIRMED");
         settlement.setConfirmedAt(LocalDateTime.now());
