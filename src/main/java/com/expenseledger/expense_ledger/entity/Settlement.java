@@ -27,6 +27,10 @@ public class Settlement {
     @Column(nullable = false)
     private String status;
 
+    @Version
+    private Integer version;
+
+
     public Long getId() {
         return id;
     }
@@ -75,6 +79,7 @@ public class Settlement {
         this.status = status;
     }
 
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -96,4 +101,11 @@ public class Settlement {
 
     private LocalDateTime confirmedAt;
 
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
 }
