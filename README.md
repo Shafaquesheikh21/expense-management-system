@@ -59,21 +59,21 @@ Using Apache JMeter, 20 concurrent HTTP requests were fired at the live, deploye
 
 **20 concurrent requests fired at the same settlement — results:**
 
-![JMeter Summary Report showing 20 samples with a 45% conflict rate](./screenshots/jmeter-summary.png)
+![JMeter Summary Report showing 20 samples with a 45% conflict rate](./Screenshots/jmeter-summary.png)
 
 **One of the losing requests, correctly rejected by optimistic locking:**
 
-![JMeter response detail showing HTTP 409 Conflict from a concurrent confirm attempt](./screenshots/jmeter-409-response.png)
+![JMeter response detail showing HTTP 409 Conflict from a concurrent confirm attempt](./Screenshots/jmeter-409-response.png)
 
 **Final database state after the test — exactly one successful confirmation, version incremented once:**
 
-![pgAdmin query showing the settlement as CONFIRMED with version 1, proving no duplicate writes occurred](./screenshots/pgadmin-final-state.png)
+![pgAdmin query showing the settlement as CONFIRMED with version 1, proving no duplicate writes occurred](./Screenshots/pgadmin-final-state.png)
 
 ### 4. No sensitive data leakage
 
 Password hashes are excluded from every API response (`@JsonIgnore` on `User.passwordHash`), even when a `User` object is nested several levels deep inside a Settlement, Group, or Expense response.
 
-![Postman response after login/register showing no passwordHash field in the returned JSON](./screenshots/postman-auth-response.png)
+![Postman response after login/register showing no passwordHash field in the returned JSON](./Screenshots/postman-auth-response.png)
 
 ---
 
@@ -101,7 +101,7 @@ A full **Postman collection** with all 16 endpoints, organized by feature (Auth,
 
 **Full collection, organized by feature area:**
 
-![Postman collection sidebar showing all endpoint folders](./screenshots/postman-collection.png)
+![Postman collection sidebar showing all endpoint folders](./Screenshots/postman-collection.png)
 
 ---
 
@@ -114,7 +114,7 @@ Deployed on **Render**:
 
 **Live deploy, confirmed running:**
 
-![Render deploy logs showing the service is live with its primary URL](./screenshots/render-deploy-success.png)
+![Render deploy logs showing the service is live with its primary URL](./Screenshots/render-deploy-success.png)
 
 ---
 
