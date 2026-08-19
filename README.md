@@ -1,5 +1,7 @@
 # ExpenseLedger — Expense Splitting & Ledger Management API
 
+Frontend repo: [expense-management-system-frontend](https://github.com/Shafaquesheikh21/expense-management-system-frontend)
+
 A full-stack expense management backend built with Java and Spring Boot — supporting group expense splitting, personal recurring expenses, debt simplification, and settlement tracking with production-grade concurrency safety.
 
 **Live API:** `https://expense-management-system-cgi1.onrender.com`
