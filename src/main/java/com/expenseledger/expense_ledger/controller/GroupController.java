@@ -34,6 +34,12 @@ private SettlementService settlementService;
         Group group = groupService.createGroup(request, creatorEmail);
         return ResponseEntity.ok(group);
     }
+    @GetMapping
+    public ResponseEntity<List<Group>> getMyGroups(Authentication authentication) {
+        String userEmail = authentication.getName();
+        List<Group> groups = groupService.getUserGroups(userEmail);
+        return ResponseEntity.ok(groups);
+    }
     @PostMapping("/{groupId}/members")
     public ResponseEntity<GroupMember> addMember(
             @PathVariable Long groupId,
@@ -63,6 +69,7 @@ private SettlementService settlementService;
     public ResponseEntity<List<Settlement>> settleUp(@PathVariable Long groupId){
         return ResponseEntity.ok(settlementService.settleUp(groupId));
     }
+
 }
 
 

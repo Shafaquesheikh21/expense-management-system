@@ -51,4 +51,12 @@ public class GroupService {
     public List<GroupMember> getGroupMembers(Long groupId) {
         return groupMemberRepository.findByGroupId(groupId);
     }
+    public List<Group> getUserGroups(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        List<GroupMember> memberships = groupMemberRepository.findByUserId(user.getId());
+        return memberships.stream()
+                .map(GroupMember::getGroup)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }
