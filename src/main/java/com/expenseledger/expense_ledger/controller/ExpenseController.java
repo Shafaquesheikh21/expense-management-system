@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
 @RestController
 @RequestMapping("/api/groups")
 public class ExpenseController {
@@ -23,5 +24,10 @@ public class ExpenseController {
         String payerEmail = authentication.getName();
         Expense expense = expenseService.addExpense(groupId, request, payerEmail);
         return ResponseEntity.ok(expense);
+    }
+    @GetMapping("/{groupId}/expenses")
+    public ResponseEntity<List<Expense>> getExpenses(@PathVariable Long groupId) {
+        List<Expense> expenses = expenseService.getGroupExpenses(groupId);
+        return ResponseEntity.ok(expenses);
     }
 }

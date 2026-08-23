@@ -38,7 +38,9 @@ public class ExpenseService {
     private UserRepository userRepository;
     @Autowired
     private AuditLogService auditLogService;
-
+    public List<Expense> getGroupExpenses(Long groupId) {
+        return expenseRepository.findByGroupIdOrderByIdDesc(groupId);
+    }
     @Transactional
     public Expense addExpense(Long groupId, AddExpenseRequest request, String payerEmail) {
 
