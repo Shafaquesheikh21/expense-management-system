@@ -118,34 +118,28 @@ public class SettlementService {
         return savedSettlements;
     }
  @Transactional
-    public Settlement confirmSettlement(Long settlementId){
-        Settlement settlement = settlementRepository.findById(settlementId)
-                .orElseThrow(()-> new RuntimeException("Settlement not found"));
-        if("CONFIRMED".equals(settlement.getStatus())){
-            return settlement;
-        }
-        settlement.setStatus("CONFIRMED");
-        settlement.setConfirmedAt(LocalDateTime.now());
-        settlementRepository.save(settlement);
-     Optional<Balance> balance = balanceRepository.findByGroupIdAndOwedByIdAndOwedToId(
-             settlement.getGroup().getId(),
-             settlement.getFromUser().getId(),
-             settlement.getToUser().getId()
-     );
-     if(balance.isPresent()){
-         Balance existingBalance = balance.get();
-         BigDecimal newAmount = existingBalance.getAmount().subtract(settlement.getAmount());
-       if(newAmount.compareTo(BigDecimal.ZERO)<=0){
-          balanceRepository.delete(existingBalance);
-       }
-       else {
-           existingBalance.setAmount(newAmount);
-           balanceRepository.save(existingBalance);
-       }
+ public Settlement confirmSettlement(Long settlementId){
+     Settlement settlement = settlementRepository.findById(settlementId)
+             .orElseThrow(()-> new RuntimeException("Settlement not found"));
+
+     if("CONFIRMED".equals(settlement.getStatus())){
+         return settlement;
      }
+
+     settlement.setStatus("CONFIRMED");
+     settlement.setConfirmedAt(LocalDateTime.now());
+     settlementRepository.save(settlement);
+
+     Long groupId = settlement.getGroup().getId();
+     Long fromUserId = settlement.getFromUser().getId();
+     BigDecimal amount = settlement.getAmount();
+
+     reduceDebtsOwedBy(groupId, fromUserId, amount);
+
      return settlement;
  }
- public List<BalanceView> getGroupBalances(Long groupId){
+
+    public List<BalanceView> getGroupBalances(Long groupId){
      List<Balance> balances = balanceRepository.findByGroupId(groupId);
      List<BalanceView> views = new ArrayList<>();
      for (Balance balance : balances) {
@@ -162,4 +156,24 @@ public class SettlementService {
 
      return views;
  }
+    private void reduceDebtsOwedBy(Long groupId, Long userId, BigDecimal amount) {
+        List<Balance> debts = balanceRepository.findByGroupIdAndOwedById(groupId, userId);
+        BigDecimal remaining = amount;
+
+        for (Balance debt : debts) {
+            if (remaining.compareTo(BigDecimal.ZERO) <= 0) break;
+
+            BigDecimal reduceBy = debt.getAmount().min(remaining);
+            BigDecimal newAmount = debt.getAmount().subtract(reduceBy);
+
+            if (newAmount.compareTo(BigDecimal.ZERO) <= 0) {
+                balanceRepository.delete(debt);
+            } else {
+                debt.setAmount(newAmount);
+                balanceRepository.save(debt);
+            }
+
+            remaining = remaining.subtract(reduceBy);
+        }
+    }
 }

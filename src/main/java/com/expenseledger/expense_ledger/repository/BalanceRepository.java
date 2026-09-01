@@ -6,4 +6,6 @@ import java.util.Optional;
 public interface BalanceRepository extends JpaRepository<Balance, Long>{
   Optional<Balance> findByGroupIdAndOwedByIdAndOwedToId(Long groupId, Long owedById, Long owedToId);
   List<Balance> findByGroupId(Long groupId);
+  List<Balance> findByGroupIdAndOwedById(Long groupId, Long owedById);
+  List<Balance> findByGroupIdAndOwedToId(Long groupId, Long owedToId);
 }
