@@ -32,8 +32,11 @@ public class PersonalExpenseController {
     }
 
     @PostMapping("/{expenseId}/mark-paid")
-    public ResponseEntity<PersonalExpense> markAsPaid(@PathVariable Long expenseId) {
-        return ResponseEntity.ok(personalExpenseService.markAsPaid(expenseId));
+    public ResponseEntity<?> markAsPaid(@PathVariable Long expenseId) {
+        try {
+            return ResponseEntity.ok(personalExpenseService.markAsPaid(expenseId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
-
 }
