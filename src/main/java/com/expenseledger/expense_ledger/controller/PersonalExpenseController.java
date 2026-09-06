@@ -39,4 +39,18 @@ public class PersonalExpenseController {
             return ResponseEntity.status(400).body(e.getMessage());
         }
     }
+    @DeleteMapping("/{expenseId}")
+    public ResponseEntity<?> deleteExpense(
+            @PathVariable Long expenseId,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        try {
+            personalExpenseService.deleteExpense(expenseId, email);
+            return ResponseEntity.ok("Expense deleted successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
+    }
 }

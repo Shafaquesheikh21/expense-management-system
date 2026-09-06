@@ -40,6 +40,21 @@ public class PersonalExpenseService {
         return personalExpenseRepository.findByUserId(user.getId());
 
     }
+    public void deleteExpense(Long expenseId, String userEmail) {
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        PersonalExpense expense = personalExpenseRepository.findById(expenseId)
+                .orElseThrow(() -> new RuntimeException("Expense not found"));
+
+        // Only the user who created the expense can delete it
+        if (!expense.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("You are not authorized to delete this expense");
+        }
+
+        personalExpenseRepository.delete(expense);
+    }
     private LocalDate calculateFirstDueDate(String recurrence, Integer dueDay){
         LocalDate today = LocalDate.now();
 
