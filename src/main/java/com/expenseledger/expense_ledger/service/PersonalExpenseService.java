@@ -29,7 +29,7 @@ public class PersonalExpenseService {
         expense.setDueDay(request.getDueDay());
         expense.setIsActive(true);
         expense.setIsOverDue(false);
-        expense.setNextDueDate(calculateFirstDueDate(request.getDueDay()));
+        expense.setNextDueDate(calculateFirstDueDate(request.getRecurrence(), request.getDueDay()));
 
         return personalExpenseRepository.save(expense);
 
@@ -40,14 +40,24 @@ public class PersonalExpenseService {
         return personalExpenseRepository.findByUserId(user.getId());
 
     }
-    private LocalDate calculateFirstDueDate(Integer dueDay){
+    private LocalDate calculateFirstDueDate(String recurrence, Integer dueDay){
         LocalDate today = LocalDate.now();
-        LocalDate candidateDate = today.withDayOfMonth(Math.min(dueDay, today.lengthOfMonth()));
-        if(candidateDate.isBefore(today) || candidateDate.isEqual(today)){
-            candidateDate = candidateDate.plusMonths(1).withDayOfMonth(Math.min(dueDay,
-                    candidateDate.plusMonths(1).lengthOfMonth()));
+
+        if ("WEEKLY".equals(recurrence)) {
+            java.time.DayOfWeek targetDay = java.time.DayOfWeek.of(dueDay);
+            LocalDate candidateDate = today.with(java.time.temporal.TemporalAdjusters.nextOrSame(targetDay));
+            if (candidateDate.isEqual(today)) {
+                candidateDate = candidateDate.plusWeeks(1);
+            }
+            return candidateDate;
+        } else {
+            LocalDate candidateDate = today.withDayOfMonth(Math.min(dueDay, today.lengthOfMonth()));
+            if(candidateDate.isBefore(today) || candidateDate.isEqual(today)){
+                candidateDate = candidateDate.plusMonths(1).withDayOfMonth(Math.min(dueDay,
+                        candidateDate.plusMonths(1).lengthOfMonth()));
+            }
+            return candidateDate;
         }
-        return candidateDate;
     }
     public PersonalExpense markAsPaid(Long expenseId){
         PersonalExpense expense = personalExpenseRepository.findById(expenseId)
